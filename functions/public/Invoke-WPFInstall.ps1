@@ -9,7 +9,7 @@ function Invoke-WPFInstall {
     )
 
     if ($PackagesToInstall.Count -eq 0) {
-        $WarningMsg = "Please select the program(s) to install or upgrade."
+        $WarningMsg = Get-WinUtilLocalizedText "Please select the program(s) to install or upgrade."
         Show-WinUtilMessage -Message $WarningMsg -Title "WinUtil" -Button "OK" -Icon "Warning"
         return
     }

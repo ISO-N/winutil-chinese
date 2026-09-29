@@ -18,6 +18,12 @@ function Show-WinUtilMessage {
         $Icon = "Information"
     )
 
+    # Static prompts localize through this exact-string lookup with no call-site change;
+    # dynamic ones are templated with Get-WinUtilLocalizedText at their call site and miss
+    # this lookup harmlessly. "WinUtil" as a title never matches a key, by design.
+    $Message = Get-WinUtilLocalizedText $Message
+    $Title = Get-WinUtilLocalizedText $Title
+
     Write-WinUtilLog -Component "Dialog" -Message "$Title : $($Message -replace '\r?\n', ' ')"
 
     if (-not (Test-WinUtilUIAlive)) {
