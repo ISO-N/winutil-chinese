@@ -18,8 +18,8 @@ function Get-WinUtilEntryToolTip {
     )
 
     if ([string]::IsNullOrWhiteSpace($Description)) {
-        return "Preset key: $Key"
+        return (Get-WinUtilLocalizedText "Preset key: {0}" -Values $Key)
     }
 
-    return "$Description`n`nPreset key: $Key"
+    return "$(Get-WinUtilLocalizedText $Description)`n`n$(Get-WinUtilLocalizedText "Preset key: {0}" -Values $Key)"
 }

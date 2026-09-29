@@ -2,9 +2,9 @@ name: Compile & Check
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "dev"]
   pull_request:
-    branches: ["main"]
+    branches: ["main", "dev"]
   workflow_dispatch: # Manual trigger added
   workflow_call: # Allow other Actions to call this workflow
 

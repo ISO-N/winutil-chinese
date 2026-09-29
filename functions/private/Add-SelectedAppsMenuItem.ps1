@@ -21,8 +21,8 @@ function Add-SelectedAppsMenuItem {
     # Sets the name to the Content as well as the Tooltip, because the parent Popup Border has a fixed width and text could "overflow".
     # With the tooltip, you can still read the whole entry on hover
     $selectedAppLabel = New-Object Windows.Controls.Label
-    $selectedAppLabel.Content = $name
-    $selectedAppLabel.ToolTip = $name
+    $selectedAppLabel.Content = Get-WinUtilLocalizedText $name
+    $selectedAppLabel.ToolTip = Get-WinUtilLocalizedText $name
     $selectedAppLabel.HorizontalAlignment = "Left"
     $selectedAppLabel.SetResourceReference([Windows.Controls.Control]::ForegroundProperty, "MainForegroundColor")
     [System.Windows.Controls.Grid]::SetColumn($selectedAppLabel, 0)
@@ -33,7 +33,7 @@ function Add-SelectedAppsMenuItem {
     $selectedAppRemoveButton.Content = [string]([char]0xE711)
     $selectedAppRemoveButton.HorizontalAlignment = "Center"
     $selectedAppRemoveButton.Tag = $key
-    $selectedAppRemoveButton.ToolTip = "Remove the App from Selection"
+    $selectedAppRemoveButton.ToolTip = Get-WinUtilLocalizedText "Remove the App from Selection"
     $selectedAppRemoveButton.SetResourceReference([Windows.Controls.Control]::ForegroundProperty, "MainForegroundColor")
     $selectedAppRemoveButton.SetResourceReference([Windows.Controls.Control]::StyleProperty, "HoverButtonStyle")
 

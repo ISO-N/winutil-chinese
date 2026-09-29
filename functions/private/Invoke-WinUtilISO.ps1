@@ -186,7 +186,7 @@ function Invoke-WinUtilISOMountAndVerify {
                     Write-WinUtilISOLog "Dismounted the previously verified ISO: $previous"
                 } catch {
                     Write-WinUtilISOLog -Level "ERROR" -Message "Could not dismount the previously verified ISO ${previous}: $_"
-                    Show-WinUtilMessage -Message "The previously verified ISO is still mounted and could not be dismounted:`n`n$previous`n`nDismount it yourself, then select an ISO again." -Title "Previous ISO Still Mounted" -Button "OK" -Icon "Error" | Out-Null
+                    Show-WinUtilMessage -Message (Get-WinUtilLocalizedText "The previously verified ISO is still mounted and could not be dismounted:`n`n{0}`n`nDismount it yourself, then select an ISO again." -Values $previous) -Title "Previous ISO Still Mounted" -Button "OK" -Icon "Error" | Out-Null
                     $stillMounted = [System.InvalidOperationException]::new("Could not dismount the previously verified ISO $previous.")
                     $stillMounted.Data["WinUtilErrorReported"] = $true
                     throw $stillMounted
@@ -401,7 +401,7 @@ function Invoke-WinUtilISOModify {
 
             if ($driversInjected.Value) {
                 Step-WinUtilJob -Status "Finalizing install image..." -Percent 70
-                Write-WinUtilISOLog "Added current-system drivers to $sourceImageFileName index $SelectedWimIndex."
+                Write-WinUtilISOLog "Added current-system drivers to $sourceImageFileName index $SelectedWimIndex with one mount and commit."
             } elseif ($InjectDrivers) {
                 Step-WinUtilJob -Status "Preserving install image..." -Percent 70
                 Write-WinUtilISOLog "No current-system drivers were injected into $sourceImageFileName index $SelectedWimIndex; install.wim was left unchanged. Review the warning log entries for details."
@@ -426,7 +426,7 @@ function Invoke-WinUtilISOModify {
             Write-WinUtilISOLog -Level "ERROR" -Message "Modification failed: $_"
             $_.Exception.Data["WinUtilErrorReported"] = $true
 
-            Show-WinUtilMessage -Message "An error occurred during install.wim modification:`n`n$_" -Title "Modification Error" -Button "OK" -Icon "Error" | Out-Null
+            Show-WinUtilMessage -Message (Get-WinUtilLocalizedText "An error occurred during install.wim modification:`n`n{0}" -Values $_) -Title "Modification Error" -Button "OK" -Icon "Error" | Out-Null
 
             throw
         } finally {
@@ -503,14 +503,14 @@ function Invoke-WinUtilISOCheckExistingWork {
     Write-WinUtilISOLog "Last modified: $modified - Skipping the earlier steps and resuming at the output step."
     Write-WinUtilISOLog "Click 'Start Over' if you want to start over with a new ISO."
 
-    Show-WinUtilMessage -Message "A previous WinUtil ISO working directory was found:`n`n$($existingWorkDir.FullName)`n`n(Last modified: $modified)`n`nThe output step has been restored so you can save the already-modified image.`n`nClick 'Start Over' there if you want to start over." -Title "Existing Work Found" -Button "OK" -Icon "Info" | Out-Null
+    Show-WinUtilMessage -Message (Get-WinUtilLocalizedText "A previous WinUtil ISO working directory was found:`n`n{0}`n`n(Last modified: {1})`n`nThe output step has been restored so you can save the already-modified image.`n`nClick 'Start Over' there if you want to start over." -Values $existingWorkDir.FullName, $modified) -Title "Existing Work Found" -Button "OK" -Icon "Info" | Out-Null
 }
 
 function Invoke-WinUtilISOCleanAndReset {
     $workDir = $sync["Win11ISOWorkDir"]
 
     if ($workDir -and (Test-Path $workDir)) {
-        $confirm = Show-WinUtilMessage -Message "This will delete the temporary working directory:`n`n$workDir`n`nAnd reset the interface back to the start.`n`nContinue?" -Title "Start Over" -Button "YesNo" -Icon "Warning"
+        $confirm = Show-WinUtilMessage -Message (Get-WinUtilLocalizedText "This will delete the temporary working directory:`n`n{0}`n`nAnd reset the interface back to the start.`n`nContinue?" -Values $workDir) -Title "Start Over" -Button "YesNo" -Icon "Warning"
         if ($confirm -ne "Yes") { return }
     }
 
@@ -708,16 +708,16 @@ function Invoke-WinUtilISOExport {
             Invoke-WPFUIThread -Parameters @{ OutputISO = $outputISO } -ScriptBlock {
                 param($OutputISO)
 
-                $sync["WPFWin11ISODoneLabel"].Text        = "ISO saved to $OutputISO"
+                $sync["WPFWin11ISODoneLabel"].Text        = Get-WinUtilLocalizedText "ISO saved to {0}" -Values $OutputISO
                 $sync["WPFWin11ISODonePanel"].Visibility  = "Visible"
             }
             Set-WinUtilISOStep -Step "Output"
-            Show-WinUtilMessage -Message "ISO exported successfully!`n`n$outputISO" -Title "Export Complete" -Button "OK" -Icon "Info" | Out-Null
+            Show-WinUtilMessage -Message (Get-WinUtilLocalizedText "ISO exported successfully!`n`n{0}" -Values $outputISO) -Title "Export Complete" -Button "OK" -Icon "Info" | Out-Null
         } catch {
             Write-WinUtilISOLog -Level "ERROR" -Message "ISO export failed: $_"
             $_.Exception.Data["WinUtilErrorReported"] = $true
             Set-WinUtilISOStep -Step "Output"
-            Show-WinUtilMessage -Message "ISO export failed:`n`n$_" -Title "Error" -Button "OK" -Icon "Error" | Out-Null
+            Show-WinUtilMessage -Message (Get-WinUtilLocalizedText "ISO export failed:`n`n{0}" -Values $_) -Title "Error" -Button "OK" -Icon "Error" | Out-Null
             throw
         } finally {
             Invoke-WPFUIThread -ScriptBlock {

@@ -10,14 +10,14 @@ function Invoke-WPFUnInstall {
     #>
 
     if ($PackagesToUninstall.Count -eq 0) {
-        $WarningMsg = "Please select the program(s) to uninstall"
+        $WarningMsg = Get-WinUtilLocalizedText "Please select the program(s) to uninstall"
         Show-WinUtilMessage -Message $WarningMsg -Title "WinUtil" -Button "OK" -Icon "Warning"
         return
     }
 
     $ButtonType = "YesNo"
     $MessageboxTitle = "Are you sure?"
-    $Messageboxbody = ("This will uninstall the following applications: `n $($PackagesToUninstall | Select-Object Name, Description| Out-String)")
+    $Messageboxbody = Get-WinUtilLocalizedText "This will uninstall the following applications: `n {0}" -Values ($PackagesToUninstall | Select-Object Name, Description| Out-String)
     $MessageIcon = "Information"
 
     $confirm = Show-WinUtilMessage -Message $Messageboxbody -Title $MessageboxTitle -Button $ButtonType -Icon $MessageIcon

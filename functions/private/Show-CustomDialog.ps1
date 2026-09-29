@@ -98,6 +98,11 @@ function Show-CustomDialog {
         [bool]$EnableScroll = $false
     )
 
+    # Same localization contract as Show-WinUtilMessage: static text is keyed by its exact
+    # source string, composed text passes through untouched.
+    $Message = Get-WinUtilLocalizedText $Message
+    $Title = Get-WinUtilLocalizedText $Title
+
     # Create a custom dialog window
     $dialog = New-Object Windows.Window
     $dialog.Title = $Title
@@ -262,7 +267,7 @@ function Show-CustomDialog {
 
     # Add OK button
     $okButton = New-Object Windows.Controls.Button
-    $okButton.Content = "OK"
+    $okButton.Content = Get-WinUtilLocalizedText "OK"
     $okButton.FontSize = $FontSize
     $okButton.Width = 80
     $okButton.Height = 30

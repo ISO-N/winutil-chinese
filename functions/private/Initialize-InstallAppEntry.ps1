@@ -63,15 +63,15 @@ function Initialize-InstallAppEntry {
         # Create the TextBlock for the application name
         $appName = New-Object Windows.Controls.TextBlock
         $appName.Style = $sync.Form.Resources.AppEntryNameStyle
-        $appName.Text = $app.content
+        $appName.Text = Get-WinUtilLocalizedText $app.content
 
         # Add FOSS label after the name if FOSS
         [void]$contentPanel.Children.Add($appName)
         $checkBox.Content = $contentPanel
 
         # Add accessibility properties to make the elements screen reader friendly
-        $checkBox.SetValue([Windows.Automation.AutomationProperties]::NameProperty, $app.content)
-        $border.SetValue([Windows.Automation.AutomationProperties]::NameProperty, $app.content)
+        $checkBox.SetValue([Windows.Automation.AutomationProperties]::NameProperty, (Get-WinUtilLocalizedText $app.content))
+        $border.SetValue([Windows.Automation.AutomationProperties]::NameProperty, (Get-WinUtilLocalizedText $app.content))
 
         # Keep the same layout for every entry so the checkbox handlers can reach the border
         $entryLayout = New-Object Windows.Controls.Grid
