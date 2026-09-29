@@ -1,0 +1,45 @@
+---
+title: Localization
+description: How WinUtil picks its interface language, how to override it, and how to contribute a new translation.
+sidebar:
+  order: 8
+---
+
+WinUtil ships with an English interface and a Simplified Chinese (`zh-CN`) translation. The interface language is resolved at startup in this order:
+
+1. The `-Language` command line parameter, if given (`en-US` or `zh-CN`).
+2. The system UI culture. An exact match wins (`zh-CN`); otherwise the primary language tag is matched, so a `zh-TW` system also loads the `zh-CN` catalog.
+3. English as the fallback for everything that is not translated.
+
+The resolved language is written to the session log at startup.
+
+```powershell
+# Force a language regardless of the system culture
+.\winutil.ps1 -Language zh-CN
+.\winutil.ps1 -Language en-US
+```
+
+The choice is made once at startup and is not switched while the window is open.
+
+## Known limitations
+
+- The Install tab search matches the English app catalog, so searching in Chinese will not find apps whose names and descriptions are stored in English. Search still matches brand names such as `Brave`.
+- Package manager state names shown in dropdowns (for example `Enabled` / `Fully Disabled`) stay in English: the selected text is written to the registry and must not be localized.
+- Console output (`Write-Host`) and log messages remain in English on purpose, so error text can be searched and shared in issues.
+
+## Contributing a translation
+
+All catalogs live in `locales/` and are keyed by the exact English source text:
+
+- `locales/en-US.json` is the canonical key catalog (identity mapping) and is generated from the source by `tools/extract-locale-strings.ps1`.
+- `locales/zh-CN.json` holds the translations; any key missing from it falls back to English automatically.
+
+To add a language, copy `en-US.json` to `<locale>.json`, translate the values (never the keys), and add the new locale name to the `ValidateSet` of the `-Language` parameter in `scripts/start.ps1`. Keep `{0}`-style placeholders intact; they are filled in at runtime.
+
+After changing any user-visible source text, regenerate the catalog and check for drift:
+
+```pwsh
+pwsh tools/extract-locale-strings.ps1
+```
+
+The tool reports keys that no longer exist in the source (stale) and keys without a translation.
