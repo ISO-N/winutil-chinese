@@ -9,6 +9,7 @@ BeforeAll {
 
     function Test-WinUtilUIAlive { $null -ne $sync.Form -and $null -ne $sync.Form.Dispatcher }
 
+    . (Join-Path $script:functionRoot "private\Get-WinUtilLocalizedText.ps1")
     . (Join-Path $script:functionRoot "private\Invoke-WinUtilCloseRequest.ps1")
 
     function Write-WinUtilLog { param($Level, $Component, $Message, [switch]$Detail) }
