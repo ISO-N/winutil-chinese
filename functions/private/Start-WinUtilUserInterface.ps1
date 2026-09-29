@@ -20,6 +20,12 @@ function Start-WinUtilUserInterface {
 
     [xml]$XAML = $inputXML
 
+    # The locale pass edits this DOM before XamlReader reads it, so the interface ships
+    # translated without touching xaml/inputXML.xaml.
+    Measure-WinUtilStep -Scope "UI" -Name "apply locale" -ScriptBlock {
+        Set-WinUtilXamlLocale -Xaml $XAML
+    }
+
     # Read the XAML file
     $readerOperationSuccessful = $false # There's more cases of failure then success.
     $readerFailure = $null
@@ -285,7 +291,7 @@ function Start-WinUtilUserInterface {
             # Disable the install tab
             $sync.WPFTab1BT.IsEnabled = $false
             $sync.WPFTab1BT.Opacity = 0.5
-            $sync.WPFTab1BT.ToolTip = "Internet connection required for installing applications."
+            $sync.WPFTab1BT.ToolTip = Get-WinUtilLocalizedText "Internet connection required for installing applications."
 
             # The install action buttons are generated with the Install tab, so
             # Initialize-WinUtilInstallTabControls disables them when that tab is built
@@ -437,7 +443,7 @@ Version  : <a href="https://github.com/ChrisTitusTech/winutil/releases/tag/$($sy
         Invoke-WPFPopup -Action "Hide" -Popups @("Settings")
 
         $authorInfo = @"
-<a href="https://github.com/sponsors/ChrisTitusTech">Current sponsors for ChrisTitusTech:</a>
+<a href="https://github.com/sponsors/ChrisTitusTech">$(Get-WinUtilLocalizedText "Current sponsors for ChrisTitusTech:")</a>
 "@
         $authorInfo += "`n"
         try {
@@ -446,7 +452,7 @@ Version  : <a href="https://github.com/ChrisTitusTech/winutil/releases/tag/$($sy
                 $authorInfo += "<a href=`"https://github.com/sponsors/ChrisTitusTech`">$sponsor</a>`n"
             }
         } catch {
-            $authorInfo += "An error occurred while fetching or processing the sponsors: $_`n"
+            $authorInfo += (Get-WinUtilLocalizedText "An error occurred while fetching or processing the sponsors: {0}" -Values $_) + "`n"
         }
         Show-CustomDialog -Title "Sponsors" -Message $authorInfo -EnableScroll $true
     })

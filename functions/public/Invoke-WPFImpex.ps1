@@ -141,7 +141,7 @@ function Invoke-WPFImpex {
                                 $skippedDisplay += "`n...and $($skippedSelections.Count - 10) more. See the WinUtil log for details."
                             }
                             if ($sync.Form) {
-                                Show-WinUtilMessage -Message "Supported settings were imported. The following retired settings were skipped:`n`n$skippedDisplay" -Title "Legacy Configuration Partially Imported" -Icon "Warning" | Out-Null
+                                Show-WinUtilMessage -Message (Get-WinUtilLocalizedText "Supported settings were imported. The following retired settings were skipped:`n`n{0}" -Values $skippedDisplay) -Title "Legacy Configuration Partially Imported" -Icon "Warning" | Out-Null
                             }
                         }
                     } else {

@@ -102,6 +102,16 @@ Describe "Headless entry point" {
         Test-Path -LiteralPath $markerPath | Should -BeFalse
     }
 
+    It "re-downloads this repository's build when an in-memory caller has no script path" {
+        . ([scriptblock]::Create($script:elevationCommandFunction))
+        $encodedCommand = New-WinUtilElevationCommand -ScriptPath "" -Parameters @{}
+        $bootstrap = [Text.Encoding]::Unicode.GetString([Convert]::FromBase64String($encodedCommand))
+
+        $bootstrap | Should -Match 'https://github\.com/ISO-N/winutil-chinese/releases/latest/download/winutil\.ps1'
+        # Relaunching into upstream's English-only release would silently drop the localized UI
+        $bootstrap | Should -Not -Match 'ChrisTitusTech/winutil/releases'
+    }
+
     It "propagates direct -File codes without terminating a file-backed wrapper" {
         $harnessPath = Join-Path $TestDrive "headless-exit-harness.ps1"
         $wrapperPath = Join-Path $TestDrive "headless-exit-wrapper.ps1"

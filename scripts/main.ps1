@@ -34,6 +34,9 @@ $sync.configs.appx.PSObject.Properties | ForEach-Object {
 $sync.preferences.theme = "Auto"
 $sync.preferences.packagemanager = "Winget"
 
+# Load the UI language strings before either the headless or the interface path consumes them
+Initialize-WinUtilLocalization -Language $Language
+
 function Remove-WinUtilTempScript {
     <#
     .SYNOPSIS

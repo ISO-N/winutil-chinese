@@ -18,14 +18,14 @@ function Invoke-WinUtilCloseRequest {
 
     # The question carries the meaning rather than naming buttons: Windows labels them in its own
     # language, so "Yes" in the text would not match a button reading "Ja".
-    $answer = Show-WinUtilMessage -Button "YesNoCancel" -Icon "Warning" -Title "$RunningJob is still running" -Message @"
-$RunningJob has not finished yet.
+    $answer = Show-WinUtilMessage -Button "YesNoCancel" -Icon "Warning" -Title (Get-WinUtilLocalizedText "{0} is still running" -Values $RunningJob) -Message (Get-WinUtilLocalizedText @"
+{0} has not finished yet.
 
 Close the window and let it finish in the console?
 
 WinUtil will exit on its own once it is done. If you do not, it will be
 stopped and everything closes now. Cancel keeps WinUtil open.
-"@
+"@ -Values $RunningJob)
 
     switch ("$answer") {
         "Yes" {

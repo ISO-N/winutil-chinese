@@ -114,6 +114,8 @@ Describe "Interface startup failures" {
     BeforeAll {
         function Measure-WinUtilStep { param($Scope, $Name, $ScriptBlock) $null = $Scope, $Name; & $ScriptBlock }
         function Write-WinUtilLog { param($Level, $Component, $Message) $null = $Level, $Component, $Message }
+        function Set-WinUtilXamlLocale { param($Xaml) $null = $Xaml }
+        function Get-WinUtilLocalizedText { param($Text, $Values) $Text }
     }
 
     BeforeEach {
@@ -473,6 +475,10 @@ Describe "XAML and sync wiring" {
             "AppCategoryChips",
             "SelectedAppCategories",
             "AppCategoryAutoExpanded",
+            # Localization state written by Initialize-WinUtilLocalization and read on every
+            # text lookup from any runspace
+            "L10n",
+            "L10nLanguage",
             "RenderedAssetCache",
             "ToggleStatusCache",
             "InstallAppRenderQueue",

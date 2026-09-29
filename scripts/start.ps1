@@ -10,6 +10,8 @@ param (
     [string]$Config,
     [ValidateSet("Standard", "Minimal", "Advanced", "")]
     [string]$Preset,
+    [ValidateSet("auto", "en-US", "zh-CN")]
+    [string]$Language = "auto",
     [switch]$Offline
 )
 
@@ -161,6 +163,9 @@ function New-WinUtilElevationCommand {
 
     # Only base64 is embedded in executable text. User-controlled values are deserialized and
     # splatted as parameter data in the child, so quotes in Config cannot become PowerShell code.
+    # An in-memory launch (`irm ... | iex`) has no `$PSCommandPath`, so the child has to download
+    # the script again. It must be this repository's build: relaunching into upstream's release
+    # would silently swap the localized UI for the English-only one.
     $bootstrap = @"
 `$launchXml = [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('$launchPayload'))
 `$launch = [System.Management.Automation.PSSerializer]::Deserialize(`$launchXml)
@@ -169,7 +174,7 @@ if (`$launch.Headless) { `$env:WINUTIL_HEADLESS_CHILD = '1' }
 if (`$launch.ScriptPath) {
     & `$launch.ScriptPath @invokeParameters
 } else {
-    `$remoteScript = [ScriptBlock]::Create((Invoke-RestMethod 'https://github.com/ChrisTitusTech/winutil/releases/latest/download/winutil.ps1'))
+    `$remoteScript = [ScriptBlock]::Create((Invoke-RestMethod 'https://github.com/ISO-N/winutil-chinese/releases/latest/download/winutil.ps1'))
     & `$remoteScript @invokeParameters
 }
 "@

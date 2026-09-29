@@ -7,6 +7,7 @@ BeforeAll {
     . (Join-Path $script:repoRoot "functions\private\Measure-WinUtilStep.ps1")
 
     . (Join-Path $script:repoRoot "functions\private\Get-WinUtilPackageLogSummary.ps1")
+    . (Join-Path $script:repoRoot "functions\private\Get-WinUtilLocalizedText.ps1")
     . (Join-Path $script:repoRoot "functions\public\Invoke-WPFInstall.ps1")
     . (Join-Path $script:repoRoot "functions\public\Invoke-WPFUnInstall.ps1")
 

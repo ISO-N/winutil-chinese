@@ -5,6 +5,7 @@
 BeforeAll {
     $script:repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
     . (Join-Path $script:repoRoot "functions\private\Get-WinUtilEntryToolTip.ps1")
+    . (Join-Path $script:repoRoot "functions\private\Get-WinUtilLocalizedText.ps1")
     . (Join-Path $script:repoRoot "functions\private\Update-WinUtilSelections.ps1")
 
     $applications = Get-Content (Join-Path $script:repoRoot "config\applications.json") -Raw | ConvertFrom-Json

@@ -29,13 +29,13 @@ function Invoke-WPFExportEnvironmentReport {
         if (Test-Path -LiteralPath $logsPath) {
             if (-not $includeLogs) {
                 Show-WinUtilMessage `
-                    -Message "A logs file already exists at:`n$logsPath`n`nChoose another report filename or include and replace the existing logs." `
+                    -Message (Get-WinUtilLocalizedText "A logs file already exists at:`n{0}`n`nChoose another report filename or include and replace the existing logs." -Values $logsPath) `
                     -Title "Environment Report" -Button "OK" -Icon "Warning" | Out-Null
                 return
             }
 
             $replaceLogs = (Show-WinUtilMessage `
-                -Message "A logs file already exists at:`n$logsPath`n`nReplace it?" `
+                -Message (Get-WinUtilLocalizedText "A logs file already exists at:`n{0}`n`nReplace it?" -Values $logsPath) `
                 -Title "Environment Report" -Button "YesNo" -Icon "Warning") -eq "Yes"
             if (-not $replaceLogs) {
                 return
@@ -70,7 +70,7 @@ function Invoke-WPFExportEnvironmentReport {
         }
     } catch {
         Write-WinUtilLog -Component "EnvironmentReport" -Level "ERROR" -Message "Environment report export failed: $($_.Exception.Message)"
-        Show-WinUtilMessage -Message "The environment report could not be exported. $($_.Exception.Message)" `
+        Show-WinUtilMessage -Message (Get-WinUtilLocalizedText "The environment report could not be exported. {0}" -Values $_.Exception.Message) `
             -Title "Environment Report" -Button "OK" -Icon "None" | Out-Null
     }
 }

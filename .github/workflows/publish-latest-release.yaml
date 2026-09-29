@@ -1,0 +1,79 @@
+name: Publish Latest Release
+
+# A single rolling Release entry instead of one dated tag per build, so the release page
+# always serves the newest main build and irm .../releases/latest/download keeps working.
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-latest-release
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Compile and publish winutil.ps1
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Compile project
+        shell: pwsh
+        run: |
+          Set-ExecutionPolicy Bypass -Scope Process -Force; ./Compile.ps1
+        continue-on-error: false # Directly fail the job on error, removing the need for a separate check
+
+      - name: Stage the download copy without the UTF-8 BOM
+        shell: pwsh
+        run: |
+          # GitHub serves release assets as application/octet-stream, so irm | iex hands the
+          # bytes to Invoke-Expression as a string. A leading U+FEFF is not whitespace to the
+          # tokenizer, which turns the script's opening <# into a command name. The build output
+          # keeps its BOM for running .\winutil.ps1 from disk; the download copy must not have one.
+          New-Item -ItemType Directory -Path dist -Force | Out-Null
+          $text = [System.IO.File]::ReadAllText("winutil.ps1")
+          [System.IO.File]::WriteAllText("dist/winutil.ps1", $text, [System.Text.UTF8Encoding]::new($false))
+
+          # ReadAllText swallows a BOM, so the guard has to look at the raw bytes.
+          $bytes = [System.IO.File]::ReadAllBytes("dist/winutil.ps1")
+          if ($bytes.Length -ge 3 -and $bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF) {
+              throw "The staged download copy still starts with a UTF-8 BOM."
+          }
+          if ($bytes[0] -ne 0x3C) {
+              throw "The staged download copy does not start with '<'."
+          }
+
+      - name: Move the latest tag to this commit
+        shell: pwsh
+        run: |
+          # The checkout keeps credentials in the local git config, so the push needs no extra token.
+          git tag -f latest
+          git push --force origin refs/tags/latest
+
+      - name: Publish the compiled script
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: latest
+          name: Latest
+          make_latest: true
+          overwrite_files: true
+          body: |
+            Every push to `main` recompiles `winutil.ps1` and replaces this asset, so this
+            entry always holds the newest build and carries no per-build tag.
+
+            Built from commit ${{ github.sha }}.
+
+            Download and run (Administrator **PowerShell 7**):
+
+            ```
+            irm https://github.com/${{ github.repository }}/releases/latest/download/winutil.ps1 | iex
+            ```
+          files: ./dist/winutil.ps1
