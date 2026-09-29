@@ -16,3 +16,6 @@ __pycache__/
 
 .vscode/
 .idea/
+
+# upstream reference checkout and local agent scratch
+winutil-origin/
